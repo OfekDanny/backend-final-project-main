@@ -19,16 +19,22 @@ const {
 // Define the developers array
 const developers = [
   {
-    firstname: 'Elad',
-    lastname: 'Asaf',
-    id: process.env.ELAD_ID,
-    email: 'elad220@gmail.com'
+    firstname: 'Ofek',
+    lastname: 'Danny',
+    id: '211539937',
+    email: 'ofekdanny@gmail.com'
   },
   {
-    firstname: 'Lidar',
-    lastname: 'Baruch',
-    id: process.env.LIDAR_ID,
-    email: 'lidarbar220@gmail.com'
+    firstname: 'Dor',
+    lastname: 'Alagem',
+    id: '212088306',
+    email: 'dor3382@gmail.com'
+  },
+  {
+    firstname: 'Yuval',
+    lastname: 'Oren',
+    id: '315140798',
+    email: 'yuvaloren25@hotmail.com'
   }
 ];
 
