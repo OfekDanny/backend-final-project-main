@@ -1,0 +1,121 @@
+{
+  "info": {
+    "name": "Cost Manager",
+    "_postman_id": "cost-manager-collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "process-logs (a)",
+      "item": [
+        {
+          "name": "Get All Logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{LOGS_URL}}/api/logs",
+              "host": ["{{LOGS_URL}}"],
+              "path": ["api", "logs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "process-users (b)",
+      "item": [
+        {
+          "name": "Add User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{USERS_URL}}/api/add",
+              "host": ["{{USERS_URL}}"],
+              "path": ["api", "add"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 111111,\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"birthday\": \"1990-05-15\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{USERS_URL}}/api/users",
+              "host": ["{{USERS_URL}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{USERS_URL}}/api/users/123123",
+              "host": ["{{USERS_URL}}"],
+              "path": ["api", "users", "123123"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "process-costs (c)",
+      "item": [
+        {
+          "name": "Add Cost",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{COSTS_URL}}/api/add",
+              "host": ["{{COSTS_URL}}"],
+              "path": ["api", "add"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userid\": 123123,\n  \"description\": \"milk\",\n  \"category\": \"food\",\n  \"sum\": 8\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Monthly Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{COSTS_URL}}/api/report?id=123123&year=2026&month=5",
+              "host": ["{{COSTS_URL}}"],
+              "path": ["api", "report"],
+              "query": [
+                { "key": "id", "value": "123123" },
+                { "key": "year", "value": "2026" },
+                { "key": "month", "value": "5" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "process-about (d)",
+      "item": [
+        {
+          "name": "Get About",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{ABOUT_URL}}/api/about",
+              "host": ["{{ABOUT_URL}}"],
+              "path": ["api", "about"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
