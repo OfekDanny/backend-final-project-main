@@ -1,15 +1,9 @@
 const { logger } = require('../utils/pino-logger');
 
-// Developer names — stored in .env or hardcoded as fallback
 const developers = [
-  {
-    first_name: process.env.DEV1_FIRST_NAME || 'Elad',
-    last_name: process.env.DEV1_LAST_NAME || 'Asaf'
-  },
-  {
-    first_name: process.env.DEV2_FIRST_NAME || 'Lidar',
-    last_name: process.env.DEV2_LAST_NAME || 'Baruch'
-  }
+  { first_name: 'Ofek', last_name: 'Danny' },
+  { first_name: 'Dor', last_name: 'Alagem' },
+  { first_name: 'Yuval', last_name: 'Oren' }
 ];
 
 const getAbout = (req, res) => {
