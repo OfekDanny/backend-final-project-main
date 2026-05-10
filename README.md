@@ -146,6 +146,6 @@ Set `USERS_URL`, `COSTS_URL`, `LOGS_URL`, `ABOUT_URL` environment variables to t
 
 ## Developers
 
-- Ofek Danny — 211539937
-- Dor Alagem — 212088306
-- Yuval Oren — 315140798
+- Ofek Danny 
+- Dor Alagem 
+- Yuval Oren 
