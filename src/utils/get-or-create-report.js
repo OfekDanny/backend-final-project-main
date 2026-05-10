@@ -1,12 +1,14 @@
-const Report = require('../models/report-model');
-const Expense = require('../models/expense-model');
+const Report = require('../models/Report');
+const Expense = require('../models/Expense');
 
+/* Retrieves an existing monthly report or builds and saves a new one */
 async function getOrCreateReport(userId, year, month, validCategories) {
-  let report = await Report.findOne({ user_id: userId, year, month });
+  // Try to find a cached report for this user/year/month
+  let report = await Report.findOne({ userId, year, month });
 
   if (!report) {
     // Get all expenses for the given month and year of the user
-    const expenses = await Expense.find({ month, year, user_id: userId });
+    const expenses = await Expense.find({ month, year, userId });
 
     // Initialize report data with empty lists for all categories
     const reportData = validCategories.reduce((acc, category) => {
@@ -14,14 +16,15 @@ async function getOrCreateReport(userId, year, month, validCategories) {
       return acc;
     }, {});
 
-    // Format the expenses into report data
+    // Format the expenses into report data grouped by category
     expenses.forEach((expense) => {
       const { day, description, sum, category } = expense;
       const expenseData = { day, description, sum };
       reportData[category].push(expenseData);
     });
 
-    report = new Report({ user_id: userId, year, month, data: reportData });
+    // Persist the new report so subsequent requests hit the cache
+    report = new Report({ userId, year, month, data: reportData });
     await report.save();
   }
 

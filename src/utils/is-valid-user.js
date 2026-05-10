@@ -1,7 +1,8 @@
-const User = require('../models/user-model');
+const User = require('../models/User');
 
-// Check if user exists in the mongoDB database
+/* Returns true if the user exists in the database; sends a 400 response and returns false otherwise */
 const isValidUser = async (userId, res) => {
+  // Look up user by their numeric ID
   const user = await User.findOne({ id: userId });
   if (!user) {
     res.status(400).json({
@@ -10,6 +11,7 @@ const isValidUser = async (userId, res) => {
     });
     return false;
   }
+  // User exists
   return true;
 };
 

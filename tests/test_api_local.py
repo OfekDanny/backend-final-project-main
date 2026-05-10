@@ -14,8 +14,8 @@ CATEGORIES = ["food", "health", "housing", "sports", "education"]
 
 test_user = {
     "id": 999999,
-    "first_name": "test",
-    "last_name": "user",
+    "firstName": "test",
+    "lastName": "user",
     "birthday": "1995-06-15",
 }
 
@@ -41,8 +41,8 @@ def test_about():
     assert isinstance(data, list)
     assert len(data) > 0
     for member in data:
-        assert "first_name" in member
-        assert "last_name" in member
+        assert "firstName" in member
+        assert "lastName" in member
         assert "id" not in member
         assert "email" not in member
 
@@ -127,8 +127,8 @@ def test_add_user():
     assert response.status_code == 201
     user = response.json()
     assert user["id"] == test_user["id"]
-    assert user["first_name"] == test_user["first_name"]
-    assert user["last_name"] == test_user["last_name"]
+    assert user["firstName"] == test_user["firstName"]
+    assert user["lastName"] == test_user["lastName"]
 
 
 def test_get_users():
@@ -144,8 +144,8 @@ def test_get_user_by_id():
     assert response.status_code == 200
     user = response.json()
     assert user["id"] == 123123
-    assert "first_name" in user
-    assert "last_name" in user
+    assert "firstName" in user
+    assert "lastName" in user
     assert "total" in user
 
 

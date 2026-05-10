@@ -1,25 +1,28 @@
-const User = require('../models/user-model');
+const User = require('../models/User');
 
-// add a user to the database
+/* Creates the default seed user on startup if it does not already exist */
 const createUser = async () => {
   const defaultUser = {
     id: 123123,
-    first_name: 'moshe',
-    last_name: 'israeli',
+    firstName: 'moshe',
+    lastName: 'israeli',
     birthday: 'January, 10th, 1990'
   };
+
+  // Skip creation if the user already exists
   const user = await User.findOne({ id: defaultUser.id });
   if (!user) {
-    const user = await User.create({
-      id: defaultUser.id,
-      first_name: defaultUser.first_name,
-      last_name: defaultUser.last_name,
-      birthday: defaultUser.birthday
+    // Create and persist the default user
+    const newUser = await User.create({
+      id: defaultUser.id, firstName: defaultUser.firstName,
+      lastName: defaultUser.lastName, birthday: defaultUser.birthday
     });
-    user.save();
+    newUser.save();
+    // Confirm seeding success to the console
     console.log('User added successfully');
   } else {
     console.log('User already exists, skipping creation');
   }
 };
+
 module.exports = createUser;
