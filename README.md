@@ -1,63 +1,174 @@
-# Node.js REST API - Expense Tracker  
+# Node.js REST API - Expense Tracker
 
-This is a Node.js REST API project for an expense tracker application. The API allows users to add expenses, retrieve expenses, manage users, and perform other related operations. The project uses the Express.js framework and MongoDB for data storage.
+A microservices-based expense tracker built with Node.js, Express, and MongoDB Atlas. The system is split into four independent processes plus a main API gateway.
 
-## Prerequisites
+## Architecture
 
-Before running the project, ensure that you have the following prerequisites installed:
+| Service | Port | Responsibility |
+|---|---|---|
+| Main gateway | 3000 | User/expense CRUD, report generation |
+| process-users (b) | 3002 | User management |
+| process-costs (c) | 3003 | Cost/expense management |
+| process-logs (a) | 3001 | Request log retrieval |
+| process-about (d) | 3004 | Developer information |
 
-- Node.js
-- MongoDB
+All services share a single MongoDB Atlas cluster.
 
-## Getting Started
+## Live Deployment (Render)
 
-Follow the steps below to get started with the project:
+All four microservices are deployed on Render and always available:
 
-Clone the repository or download the source code.
+| Service | URL |
+|---|---|
+| process-logs | https://process-logs.onrender.com |
+| process-users | https://process-users.onrender.com |
+| process-costs | https://process-costs.onrender.com |
+| process-about | https://process-about.onrender.com |
 
-Install the project dependencies by running the following command in the project directory:
+### Using Postman with the live deployment
 
-Copy code
+A ready-made Postman environment is included at `postman/Cost-Manager-Render.postman_environment.json`.
 
-npm install
+1. In Postman, click **Import** and select that file
+2. Select **"Cost Manager Render"** from the environment dropdown (top-right)
+3. Send requests — no local server needed
 
-Set up the environment variables
+---
 
-npm start
+## Local Development
 
-This will start the server at <http://localhost:3000>.
+### Prerequisites
+
+- Node.js 24.x
+- A MongoDB Atlas connection string (configured via `.env`)
+
+### Getting Started
+
+1. Clone the repository.
+
+2. Create a `.env` file in each `process-*/` directory with:
+   ```
+   MONGODB_USER=<your-atlas-username>
+   MONGODB_PASS=<your-atlas-password>
+   ```
+
+3. Install dependencies for each service:
+   ```bash
+   cd process-users && npm install
+   cd ../process-costs && npm install
+   cd ../process-logs && npm install
+   cd ../process-about && npm install
+   ```
+
+4. Start each service in a separate terminal:
+   ```bash
+   cd process-users && npm start      # process-users → port 3002
+   cd process-costs && npm start      # process-costs → port 3003
+   cd process-logs  && npm start      # process-logs  → port 3001
+   cd process-about && npm start      # process-about → port 3004
+   ```
+
+5. Switch Postman to the **"Cost Manager Local"** environment (`postman/Cost-Manager.postman_environment.json`).
 
 ## API Endpoints
 
-The following API endpoints are available:
+### Main Gateway (port 3000)
 
-- GET /report: Retrieve all expenses for a given user, grouped by category.
-- GET /report-id: Retrieve all expenses for a given user, including expense IDs, grouped by category.
-- POST /addcost: Add a new expense.
-- POST /adduser: Create a new user.
-- GET /about: Get information about the developers.
-- DELETE /removeuser: Remove a user.
-- DELETE /removecost: Remove an expense.
-- DELETE /purge-user: Remove all users from the database.
-- DELETE /purge-expenses: Remove all expenses from the database.
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/report` | Monthly expense report for a user, grouped by category |
+| GET | `/about` | Developer information |
+| POST | `/addcost` | Add a new expense |
+| POST | `/adduser` | Create a new user |
+| DELETE | `/removeuser` | Delete a user by ID |
+| DELETE | `/removecost` | Delete an expense by ID |
+| DELETE | `/removereport` | Delete a cached report |
+| DELETE | `/purge-user` | Delete all users |
+| DELETE | `/purge-expenses` | Delete all expenses and reports |
+| DELETE | `/purge-reports` | Delete all reports |
+
+### process-users (port 3002)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/add` | Create a new user |
+| GET | `/api/users` | List all users |
+| GET | `/api/users/:id` | Get a user by ID (includes total spending) |
+
+### process-costs (port 3003)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/add` | Add a new cost entry |
+| GET | `/api/report` | Monthly cost report for a user |
+
+### process-logs (port 3001)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/logs` | Retrieve all request logs |
+
+### process-about (port 3004)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/about` | Get developer information |
+
+## Request & Response Format
+
+**Add user** (`POST /api/add` on process-users):
+```json
+{ "id": 123, "firstName": "John", "lastName": "Doe", "birthday": "1990-05-15" }
+```
+
+**Add cost** (`POST /api/add` on process-costs):
+```json
+{ "userid": 123, "description": "groceries", "category": "food", "sum": 45 }
+```
+Valid categories: `food`, `health`, `housing`, `sports`, `education`
+
+**Get report** (`GET /api/report?id=123&year=2026&month=5` on process-costs):
+```json
+{
+  "userid": 123,
+  "year": 2026,
+  "month": 5,
+  "costs": [{ "food": [...] }, { "health": [...] }, ...]
+}
+```
 
 ## Project Structure
 
-The project structure is as follows:
+```
+/
+├── src/                    # Main gateway
+│   ├── app.js
+│   ├── controllers/
+│   ├── models/             # Mongoose models (PascalCase filenames)
+│   ├── routes/
+│   └── utils/
+├── process-users/src/      # process-users microservice
+├── process-costs/src/      # process-costs microservice
+├── process-logs/src/       # process-logs microservice
+├── process-about/src/      # process-about microservice
+├── tests/                  # Python pytest suite
+└── postman/                # Postman collection and environment
+```
 
-- controllers: Contains the controller functions for handling API requests.
-- models: Contains the Mongoose models for defining the database schemas.
-- utils: Contains utility functions used in the controllers.
-- routes.js: Defines the API routes and their corresponding controller functions.
-- index.js: The main entry point of the application.
+## Running Tests
 
-## Database Schema
+Tests are written in Python using pytest and target all four microservices.
 
-The project uses MongoDB for data storage. The database schema includes the following collections:
+```bash
+cd tests
+pip install -r requirements.txt
+pytest test_api_local.py -v
+```
 
-- users: Stores user information.
-- expenses: Stores expense information.
+Set `USERS_URL`, `COSTS_URL`, `LOGS_URL`, `ABOUT_URL` environment variables to target a remote deployment instead of localhost.
 
-## Error Handling
+## Developers
 
-The API handles various error scenarios and returns appropriate error responses. Possible error cases include missing or invalid parameters, database errors, and resource not found.
+- Ofek Danny 
+- Dor Alagem 
+- Yuval Oren 
