@@ -74,6 +74,21 @@ A ready-made Postman environment is included at `postman/Cost-Manager-Render.pos
 
 ## API Endpoints
 
+### Main Gateway (port 3000)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/report` | Monthly expense report for a user, grouped by category |
+| GET | `/about` | Developer information |
+| POST | `/addcost` | Add a new expense |
+| POST | `/adduser` | Create a new user |
+| DELETE | `/removeuser` | Delete a user by ID |
+| DELETE | `/removecost` | Delete an expense by ID |
+| DELETE | `/removereport` | Delete a cached report |
+| DELETE | `/purge-user` | Delete all users |
+| DELETE | `/purge-expenses` | Delete all expenses and reports |
+| DELETE | `/purge-reports` | Delete all reports |
+
 ### process-users (port 3002)
 
 | Method | Endpoint | Description |
@@ -135,7 +150,7 @@ Valid categories: `food`, `health`, `housing`, `sports`, `education`
 ├── src/                    # Main gateway
 │   ├── app.js
 │   ├── controllers/
-│   ├── models/
+│   ├── models/             # Mongoose models (PascalCase filenames)
 │   ├── routes/
 │   └── utils/
 ├── process-users/src/      # process-users microservice
