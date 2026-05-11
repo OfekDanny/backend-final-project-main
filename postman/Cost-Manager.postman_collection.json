@@ -36,7 +36,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 111111,\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"birthday\": \"1990-05-15\"\n}"
+              "raw": "{\n  \"id\": 111111,\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"birthday\": \"1990-05-15\"\n}"
             }
           }
         },

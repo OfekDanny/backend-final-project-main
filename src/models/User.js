@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
-// Define the schema for users collection
+/* Schema for the users collection */
 const userSchema = new mongoose.Schema({
   id: Number,
-  first_name: String,
-  last_name: String,
+  firstName: String,
+  lastName: String,
   birthday: String
 });
 
-// Define the models for users collection
+// Register the User model
 const User = mongoose.model('User', userSchema);
 module.exports = User;
