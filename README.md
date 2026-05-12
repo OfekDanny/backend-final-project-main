@@ -7,10 +7,10 @@ A microservices-based expense tracker built with Node.js, Express, and MongoDB A
 | Service | Port | Responsibility |
 |---|---|---|
 | Main gateway | 3000 | User/expense CRUD, report generation |
-| process-users (b) | 3002 | User management |
-| process-costs (c) | 3003 | Cost/expense management |
-| process-logs (a) | 3001 | Request log retrieval |
-| process-about (d) | 3004 | Developer information |
+| process-users | 3002 | User management |
+| process-costs | 3003 | Cost/expense management |
+| process-logs | 3001 | Request log retrieval |
+| process-about | 3004 | Developer information |
 
 All services share a single MongoDB Atlas cluster.
 
@@ -70,6 +70,8 @@ A ready-made Postman environment is included at `postman/Cost-Manager-Render.pos
 
 5. Switch Postman to the **"Cost Manager Local"** environment (`postman/Cost-Manager.postman_environment.json`).
 
+---
+
 ## API Endpoints
 
 ### Main Gateway (port 3000)
@@ -114,6 +116,8 @@ A ready-made Postman environment is included at `postman/Cost-Manager-Render.pos
 |---|---|---|
 | GET | `/api/about` | Get developer information |
 
+---
+
 ## Request & Response Format
 
 **Add user** (`POST /api/add` on process-users):
@@ -137,6 +141,8 @@ Valid categories: `food`, `health`, `housing`, `sports`, `education`
 }
 ```
 
+---
+
 ## Project Structure
 
 ```
@@ -152,8 +158,10 @@ Valid categories: `food`, `health`, `housing`, `sports`, `education`
 ├── process-logs/src/       # process-logs microservice
 ├── process-about/src/      # process-about microservice
 ├── tests/                  # Python pytest suite
-└── postman/                # Postman collection and environment
+└── postman/                # Postman collection and environments
 ```
+
+---
 
 ## Running Tests
 
@@ -165,10 +173,12 @@ pip install -r requirements.txt
 pytest test_api_local.py -v
 ```
 
-Set `USERS_URL`, `COSTS_URL`, `LOGS_URL`, `ABOUT_URL` environment variables to target a remote deployment instead of localhost.
+Set `USERS_URL`, `COSTS_URL`, `LOGS_URL`, `ABOUT_URL` environment variables to target the Render deployment instead of localhost.
+
+---
 
 ## Developers
 
-- Ofek Danny 
-- Dor Alagem 
-- Yuval Oren 
+- Ofek Danny
+- Dor Alagem
+- Yuval Oren
