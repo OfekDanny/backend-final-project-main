@@ -1,184 +1,120 @@
-# Node.js REST API - Expense Tracker
+# Cost Manager - RESTful Web Services
 
-A microservices-based expense tracker built with Node.js, Express, and MongoDB Atlas. The system is split into four independent processes plus a main API gateway.
+A microservices-based cost manager built with Node.js, Express, Mongoose, and Pino, backed by MongoDB Atlas. The system is split into four independent Node.js processes, each deployed separately.
 
 ## Architecture
 
-| Service | Port | Responsibility |
-|---|---|---|
-| Main gateway | 3000 | User/expense CRUD, report generation |
-| process-users | 3002 | User management |
-| process-costs | 3003 | Cost/expense management |
-| process-logs | 3001 | Request log retrieval |
-| process-about | 3004 | Developer information |
+| Service | Port | Role | Endpoints |
+|---|---|---|---|
+| process-logs | 3001 | Admin - request log retrieval | `GET /api/logs` |
+| process-users | 3002 | User management | `POST /api/add`, `GET /api/users`, `GET /api/users/:id` |
+| process-costs | 3003 | Cost items + monthly reports | `POST /api/add`, `GET /api/report` |
+| process-about | 3004 | Developer team info | `GET /api/about` |
 
-All services share a single MongoDB Atlas cluster.
+All four processes share a single MongoDB Atlas cluster. Each `process-*` folder is an independent Node.js project with its own `package.json` and `.env`.
+
+The monthly report endpoint implements the **Computed Design Pattern** - reports for past months are cached in the `reports` collection, while current/future months are recomputed from raw cost records (see [process-costs/src/utils/get-or-create-report.js](process-costs/src/utils/get-or-create-report.js)).
+
+Logging is handled by Pino with a custom MongoDB write stream - every HTTP request and every endpoint access is persisted to the `logs` collection.
 
 ## Live Deployment (Render)
 
-All four microservices are deployed on Render and always available:
-
 | Service | URL |
 |---|---|
-| process-logs | https://process-logs.onrender.com/api/logs |
-| process-users | https://process-users.onrender.com/api/users |
-| process-costs | https://process-costs.onrender.com/api/report?id=123123&year=2026&month=5 |
-| process-about | https://process-about.onrender.com/api/about |
-
-### Using Postman with the live deployment
-
-A ready-made Postman environment is included at `postman/Cost-Manager-Render.postman_environment.json`.
-
-1. In Postman, click **Import** and select that file
-2. Select **"Cost Manager Render"** from the environment dropdown (top-right)
-3. Send requests — no local server needed
-
----
+| process-logs | https://process-logs.onrender.com |
+| process-users | https://process-users.onrender.com |
+| process-costs | https://process-costs.onrender.com |
+| process-about | https://process-about.onrender.com |
 
 ## Local Development
 
 ### Prerequisites
 
-- Node.js 24.x
-- A MongoDB Atlas connection string (configured via `.env`)
+- Node.js 18+
+- Python 3.9+ (for the pytest suite)
+- A MongoDB Atlas connection string
 
-### Getting Started
+### Setup
 
-1. Clone the repository.
-
-2. Create a `.env` file in each `process-*/` directory with:
+1. Create a `.env` file in each `process-*/` directory:
    ```
-   MONGODB_USER=<your-atlas-username>
-   MONGODB_PASS=<your-atlas-password>
+   MONGODB_USER=<atlas-username>
+   MONGODB_PASS=<atlas-password>
+   PORT=<service-port>
    ```
 
-3. Install dependencies for each service:
+2. Install dependencies in each service:
    ```bash
-   cd process-users && npm install
+   cd process-logs  && npm install
+   cd ../process-users && npm install
    cd ../process-costs && npm install
-   cd ../process-logs && npm install
    cd ../process-about && npm install
    ```
 
-4. Start each service in a separate terminal:
+3. Start each service in its own terminal:
    ```bash
-   cd process-users && npm start      # process-users → port 3002
-   cd process-costs && npm start      # process-costs → port 3003
-   cd process-logs  && npm start      # process-logs  → port 3001
-   cd process-about && npm start      # process-about → port 3004
+   cd process-logs  && npm start    # port 3001
+   cd process-users && npm start    # port 3002
+   cd process-costs && npm start    # port 3003
+   cd process-about && npm start    # port 3004
    ```
 
-5. Switch Postman to the **"Cost Manager Local"** environment (`postman/Cost-Manager.postman_environment.json`).
+## API
 
----
-
-## API Endpoints
-
-### Main Gateway (port 3000)
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/report` | Monthly expense report for a user, grouped by category |
-| GET | `/about` | Developer information |
-| POST | `/addcost` | Add a new expense |
-| POST | `/adduser` | Create a new user |
-| DELETE | `/removeuser` | Delete a user by ID |
-| DELETE | `/removecost` | Delete an expense by ID |
-| DELETE | `/removereport` | Delete a cached report |
-| DELETE | `/purge-user` | Delete all users |
-| DELETE | `/purge-expenses` | Delete all expenses and reports |
-| DELETE | `/purge-reports` | Delete all reports |
-
-### process-users (port 3002)
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/add` | Create a new user |
-| GET | `/api/users` | List all users |
-| GET | `/api/users/:id` | Get a user by ID (includes total spending) |
-
-### process-costs (port 3003)
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/add` | Add a new cost entry |
-| GET | `/api/report` | Monthly cost report for a user |
-
-### process-logs (port 3001)
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/logs` | Retrieve all request logs |
-
-### process-about (port 3004)
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/about` | Get developer information |
-
----
-
-## Request & Response Format
-
-**Add user** (`POST /api/add` on process-users):
+### Add User - `POST /api/add` (process-users)
 ```json
-{ "id": 123, "firstName": "John", "lastName": "Doe", "birthday": "1990-05-15" }
+{ "id": 123, "first_name": "John", "last_name": "Doe", "birthday": "1990-05-15" }
 ```
 
-**Add cost** (`POST /api/add` on process-costs):
+### Add Cost - `POST /api/add` (process-costs)
 ```json
 { "userid": 123, "description": "groceries", "category": "food", "sum": 45 }
 ```
-Valid categories: `food`, `health`, `housing`, `sports`, `education`
+Valid categories: `food`, `health`, `housing`, `sports`, `education`. Past dates are rejected.
 
-**Get report** (`GET /api/report?id=123&year=2026&month=5` on process-costs):
+### Monthly Report - `GET /api/report?id=123&year=2026&month=5` (process-costs)
 ```json
 {
-  "userid": 123,
-  "year": 2026,
-  "month": 5,
-  "costs": [{ "food": [...] }, { "health": [...] }, ...]
+  "userid": 123, "year": 2026, "month": 5,
+  "costs": [
+    { "food": [ { "sum": 45, "description": "groceries", "day": 12 } ] },
+    { "health": [] }, { "housing": [] }, { "sports": [] }, { "education": [] }
+  ]
 }
 ```
 
----
+### Other endpoints
+- `GET /api/users` (process-users) - list all users
+- `GET /api/users/:id` (process-users) - user details + total spending
+- `GET /api/logs` (process-logs) - all request logs
+- `GET /api/about` (process-about) - developer names
+
+All errors are returned as JSON with `id` and `message` fields.
+
+## Testing
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r tests/requirements.txt
+pytest -q                                    # 13 tests against localhost
+python tests/run_spec_local.py               # spec sample script, localhost
+python tests/run_spec_render.py              # spec sample script, Render
+```
 
 ## Project Structure
 
 ```
-/
-├── src/                    # Main gateway
-│   ├── app.js
-│   ├── controllers/
-│   ├── models/             # Mongoose models (PascalCase filenames)
-│   ├── routes/
-│   └── utils/
-├── process-users/src/      # process-users microservice
-├── process-costs/src/      # process-costs microservice
-├── process-logs/src/       # process-logs microservice
-├── process-about/src/      # process-about microservice
-├── tests/                  # Python pytest suite
-└── postman/                # Postman collection and environments
+backend-final-project/
+|-- process-logs/    # microservice (a) - port 3001
+|-- process-users/   # microservice (b) - port 3002
+|-- process-costs/   # microservice (c) - port 3003
+|-- process-about/   # microservice (d) - port 3004
+`-- tests/           # Python pytest suite + spec runners
 ```
-
----
-
-## Running Tests
-
-Tests are written in Python using pytest and target all four microservices.
-
-```bash
-cd tests
-pip install -r requirements.txt
-pytest test_api_local.py -v
-```
-
-Set `USERS_URL`, `COSTS_URL`, `LOGS_URL`, `ABOUT_URL` environment variables to target the Render deployment instead of localhost.
-
----
 
 ## Developers
 
+- Dor Alagem (team manager)
 - Ofek Danny
-- Dor Alagem
 - Yuval Oren

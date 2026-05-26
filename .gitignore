@@ -3,3 +3,6 @@ node_modules
 __pycache__
 .venv
 .DS_Store
+build_pdf.py
+dor_alagem.pdf
+spec_test_output.txt
