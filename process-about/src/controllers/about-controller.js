@@ -2,9 +2,9 @@ const { logger } = require('../utils/pino-logger');
 
 /* Hardcoded list of project developers returned by the about endpoint */
 const developers = [
-  { firstName: 'Ofek', lastName: 'Danny' },
-  { firstName: 'Dor', lastName: 'Alagem' },
-  { firstName: 'Yuval', lastName: 'Oren' }
+  { first_name: 'Ofek', last_name: 'Danny' },
+  { first_name: 'Dor', last_name: 'Alagem' },
+  { first_name: 'Yuval', last_name: 'Oren' }
 ];
 
 // GET /api/about — return the list of developers

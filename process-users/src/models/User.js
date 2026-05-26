@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 /* Schema for the users collection */
 const userSchema = new mongoose.Schema({
-  id: { type: Number },
-  firstName: { type: String },
-  lastName: { type: String },
+  id: { type: Number, unique: true },
+  first_name: { type: String },
+  last_name: { type: String },
   // Stored as a Date for proper querying
   birthday: { type: Date }
 });

@@ -4,8 +4,8 @@ const User = require('../models/User');
 const createUser = async () => {
   const defaultUser = {
     id: 123123,
-    firstName: 'mosh',
-    lastName: 'israeli',
+    first_name: 'mosh',
+    last_name: 'israeli',
     birthday: new Date('1990-01-10')
   };
 
