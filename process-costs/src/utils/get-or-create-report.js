@@ -24,25 +24,45 @@ const buildReportData = (expenses) => {
   return CATEGORIES.map(cat => ({ [cat]: map[cat] }));
 };
 
-/* Fetches a cached report for past months or builds a fresh one from cost records */
+/*
+ * Computed Design Pattern implementation for monthly reports.
+ *
+ * The pattern: instead of recomputing a report from raw cost records on every
+ * request, we persist the computed result for any month that has already ended
+ * (and is therefore immutable, since the application blocks adding costs with
+ * past dates). On subsequent requests for that same past month we return the
+ * cached result directly, skipping the aggregation entirely.
+ *
+ * Algorithm:
+ *   1. If the requested year/month is in the past, look up a cached report in
+ *      the `reports` collection. If found, return its `data` field unchanged.
+ *   2. Otherwise (or if no cache exists), query the `costs` collection for
+ *      every cost belonging to this user in the requested month/year and run
+ *      buildReportData() to group the costs by category.
+ *   3. If the month is in the past, persist the freshly-built report to the
+ *      `reports` collection so the next request hits the cache.
+ *   4. Reports for the current (or a future) month are never cached, because
+ *      new costs can still be added and the cache would become stale.
+ */
 const getOrCreateReport = async (userid, year, month) => {
   const past = isPastMonth(year, month);
 
-  // Return cached report for past months if one already exists
+  // Step 1: serve from cache when available (past months only)
   if (past) {
     const cached = await Report.findOne({ userid, year, month });
     if (cached) return cached.data;
   }
 
-  // Build report from the raw cost documents for this user/month
+  // Step 2: build the report from raw cost documents
   const expenses = await Cost.find({ month: Number(month), year: Number(year), userid: Number(userid) });
   const costs = buildReportData(expenses);
 
-  // Persist past-month reports so future requests skip the rebuild
+  // Step 3: persist past-month reports so future requests skip the rebuild
   if (past) {
     await Report.create({ userid, year, month, data: costs });
   }
 
+  // Step 4: current/future months are returned without caching
   return costs;
 };
 

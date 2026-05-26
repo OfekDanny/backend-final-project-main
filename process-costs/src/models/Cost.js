@@ -15,7 +15,8 @@ const costSchema = new mongoose.Schema({
     type: String,
     enum: ['food', 'health', 'housing', 'sports', 'education']
   },
-  sum: { type: Number, required: [true, 'Cost must have a sum'] }
+  // Stored as BSON Double for accurate monetary precision
+  sum: { type: mongoose.Schema.Types.Double, required: [true, 'Cost must have a sum'] }
 });
 
 // Auto-assign the next ID before saving a new cost
