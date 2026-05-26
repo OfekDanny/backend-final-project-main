@@ -20,10 +20,10 @@ All four microservices are deployed on Render and always available:
 
 | Service | URL |
 |---|---|
-| process-logs | https://process-logs.onrender.com |
-| process-users | https://process-users.onrender.com |
-| process-costs | https://process-costs.onrender.com |
-| process-about | https://process-about.onrender.com |
+| process-logs | https://process-logs.onrender.com/api/logs |
+| process-users | https://process-users.onrender.com/api/users |
+| process-costs | https://process-costs.onrender.com/api/report?id=123123&year=2026&month=5 |
+| process-about | https://process-about.onrender.com/api/about |
 
 ### Using Postman with the live deployment
 
